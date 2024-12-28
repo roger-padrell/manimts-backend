@@ -1,9 +1,28 @@
-FROM manimcommunity/manim:v0.18.1
+FROM python:3.10-slim
 
-USER root
-RUN pip install fastapi==0.104.1 uvicorn==0.24.0 python-multipart==0.0.6 psutil==5.9.6
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    ffmpeg \
+    sox \
+    libcairo2-dev \
+    libpango1.0-dev \
+    texlive \
+    texlive-latex-extra \
+    texlive-fonts-extra \
+    texlive-latex-recommended \
+    texlive-science \
+    tipa \
+    libpq-dev \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /manim
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
 
 EXPOSE 8000
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
