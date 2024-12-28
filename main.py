@@ -119,7 +119,7 @@ async def execute_code_task(execution_id: str, code: str):
                     "stdout": stdout.decode(),
                     "stderr": stderr.decode(),
                     "return_code": process.returncode,
-                    "video_url": f"/media/{video_path}"
+                    "video_url": f"http://manimts-backend.onrender.com/media/{video_path}"
                 }
                 executions[execution_id]["status"] = ExecutionStatus.SUCCESS
                 executions[execution_id]["result"] = result
