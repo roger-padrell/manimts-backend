@@ -113,16 +113,22 @@ async def execute_code_task(execution_id: str, code: str):
             try:
                 stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=300)
                 # The video will be in ./media/videos/{base_name}/1080p60/MainScene.mp4
-                video_path = os.path.join("videos", base_name, "1080p60", "MainScene.mp4")
+                full_video_path = os.path.join(MEDIA_DIR, "videos", base_name, "1080p60", "MainScene.mp4")
                 
-                result = {
-                    "stdout": stdout.decode(),
-                    "stderr": stderr.decode(),
-                    "return_code": process.returncode,
-                    "video_url": f"http://manimts-backend.onrender.com/media/{video_path}"
-                }
-                executions[execution_id]["status"] = ExecutionStatus.SUCCESS
-                executions[execution_id]["result"] = result
+                # Check if the video file was generated
+                if os.path.exists(full_video_path):
+                    result = {
+                        "stdout": stdout.decode(),
+                        "stderr": stderr.decode(),
+                        "return_code": process.returncode,
+                        "video_url": f"http://manimts-backend.onrender.com/media/videos/{base_name}/1080p60/MainScene.mp4"
+                    }
+                    executions[execution_id]["status"] = ExecutionStatus.SUCCESS
+                    executions[execution_id]["result"] = result
+                else:
+                    executions[execution_id]["status"] = ExecutionStatus.ERROR
+                    executions[execution_id]["error_message"] = "Video file was not generated"
+
             except asyncio.TimeoutError:
                 if process.returncode is None:
                     process.terminate()
